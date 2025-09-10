@@ -1,6 +1,7 @@
 use ark_ec::twisted_edwards::{Affine, TECurveConfig};
 use ark_ec::{AdditiveGroup, AffineRepr, CurveGroup};
 use ark_ff::{BigInteger, PrimeField};
+use ark_serialize::{CanonicalDeserialize, CanonicalSerialize};
 use ark_std::{vec, vec::Vec};
 
 use w3f_plonk_common::domain::Domain;
@@ -9,7 +10,7 @@ use w3f_plonk_common::gadgets::ec::AffineColumn;
 use crate::piop::FixedColumns;
 
 /// Plonk Interactive Oracle Proofs (PIOP) parameters.
-#[derive(Clone)]
+#[derive(Clone, CanonicalDeserialize, CanonicalSerialize)]
 pub struct PiopParams<F: PrimeField, Curve: TECurveConfig<BaseField = F>> {
     /// Domain over which the piop is represented.
     pub(crate) domain: Domain<F>,
@@ -23,6 +24,8 @@ pub struct PiopParams<F: PrimeField, Curve: TECurveConfig<BaseField = F>> {
     pub(crate) seed: Affine<Curve>,
     /// The point used to pad the list of public keys.
     pub(crate) padding: Affine<Curve>,
+    /// The power of 2 multiples h
+    pub(crate) power_of_2_multiples_of_h: Vec<Affine<Curve>>,
 }
 
 impl<F: PrimeField, Curve: TECurveConfig<BaseField = F>> PiopParams<F, Curve> {
@@ -43,14 +46,17 @@ impl<F: PrimeField, Curve: TECurveConfig<BaseField = F>> PiopParams<F, Curve> {
         let scalar_bitlen = Curve::ScalarField::MODULUS_BIT_SIZE as usize;
         // 1 accounts for the last cells of the points and bits columns that remain unconstrained
         let keyset_part_size = domain.capacity - scalar_bitlen - 1;
-        Self {
+        let mut p = Self {
             domain,
             scalar_bitlen,
             keyset_part_size,
             h,
             seed,
             padding,
-        }
+            power_of_2_multiples_of_h: Vec::new(),
+        };
+        p.power_of_2_multiples_of_h = p.power_of_2_multiples_of_h();
+        p
     }
 
     pub fn fixed_columns(&self, keys: &[Affine<Curve>]) -> FixedColumns<F, Affine<Curve>> {

@@ -3,6 +3,7 @@ use ark_poly::univariate::DensePolynomial;
 use ark_poly::{
     DenseUVPolynomial, EvaluationDomain, Evaluations, GeneralEvaluationDomain, Polynomial,
 };
+use ark_serialize::{CanonicalDeserialize, CanonicalSerialize};
 use ark_std::{vec, vec::Vec};
 
 use crate::FieldColumn;
@@ -10,7 +11,7 @@ use crate::FieldColumn;
 pub const ZK_ROWS: usize = 3;
 
 // Domains for performing calculations with constraint polynomials of degree up to 4.
-#[derive(Clone)]
+#[derive(Clone, CanonicalDeserialize, CanonicalSerialize)]
 struct Domains<F: FftField> {
     x1: GeneralEvaluationDomain<F>,
     x4: GeneralEvaluationDomain<F>,
@@ -57,7 +58,7 @@ impl<F: FftField> Domains<F> {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, CanonicalDeserialize, CanonicalSerialize)]
 pub struct Domain<F: FftField> {
     domains: Domains<F>,
     pub hiding: bool,
