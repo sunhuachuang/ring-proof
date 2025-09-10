@@ -73,7 +73,7 @@ impl<F: PrimeField, Curve: TECurveConfig<BaseField = F>> PiopParams<F, Curve> {
         assert!(keys.len() <= self.keyset_part_size);
         let padding_len = self.keyset_part_size - keys.len();
         let padding = vec![self.padding; padding_len];
-        let points = [keys, &padding, &self.power_of_2_multiples_of_h()].concat();
+        let points = [keys, &padding, &self.power_of_2_multiples_of_h].concat();
         assert_eq!(points.len(), self.domain.capacity - 1);
         AffineColumn::public_column(points, &self.domain)
     }
