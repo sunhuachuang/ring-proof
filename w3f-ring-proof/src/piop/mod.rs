@@ -165,7 +165,7 @@ impl<E: Pairing> VerifierKey<E::ScalarField, KZG<E>> {
 
 pub fn index<F: PrimeField, CS: PCS<F>, Curve: TECurveConfig<BaseField = F>>(
     pcs_params: &CS::Params,
-    piop_params: &PiopParams<F, Curve>,
+    piop_params: &PiopParams<F, Curve, CS>,
     keys: &[Affine<Curve>],
 ) -> (ProverKey<F, CS, Affine<Curve>>, VerifierKey<F, CS>) {
     let pcs_ck = pcs_params.ck();
@@ -185,5 +185,28 @@ pub fn index<F: PrimeField, CS: PCS<F>, Curve: TECurveConfig<BaseField = F>>(
         pcs_raw_vk,
         fixed_columns_committed,
     };
+    (prover_key, verifier_key)
+}
+
+pub fn index_lagrange<F: PrimeField, CS: PCS<F>, Curve: TECurveConfig<BaseField = F>>(
+    pcs_ck: CS::CK,
+    pcs_raw_vk: <CS::Params as PcsParams>::RVK,
+    piop_params: &PiopParams<F, Curve, CS>,
+    keys: &[Affine<Curve>],
+) -> (ProverKey<F, CS, Affine<Curve>>, VerifierKey<F, CS>) {
+    let (fixed_columns, fixed_columns_committed) = piop_params.commit(&pcs_ck, &keys);
+
+    let verifier_key1 = VerifierKey {
+        pcs_raw_vk: pcs_raw_vk.clone(),
+        fixed_columns_committed: fixed_columns_committed.clone()
+    };
+    let verifier_key = VerifierKey { pcs_raw_vk, fixed_columns_committed };
+
+    let prover_key = ProverKey {
+        pcs_ck,
+        fixed_columns,
+        verifier_key: verifier_key1
+    };
+
     (prover_key, verifier_key)
 }

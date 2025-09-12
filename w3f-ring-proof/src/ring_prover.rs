@@ -17,7 +17,7 @@ where
     Curve: TECurveConfig<BaseField = F>,
     T: PlonkTranscript<F, CS>,
 {
-    piop_params: PiopParams<F, Curve>,
+    piop_params: PiopParams<F, Curve, CS>,
     fixed_columns: FixedColumns<F, Affine<Curve>>,
     k: usize,
     plonk_prover: PlonkProver<F, CS, T>,
@@ -32,7 +32,7 @@ where
 {
     pub fn init(
         prover_key: ProverKey<F, CS, Affine<Curve>>,
-        piop_params: PiopParams<F, Curve>,
+        piop_params: PiopParams<F, Curve, CS>,
         k: usize,
         empty_transcript: T,
     ) -> Self {
@@ -59,7 +59,7 @@ where
         self.plonk_prover.prove(piop)
     }
 
-    pub fn piop_params(&self) -> &PiopParams<F, Curve> {
+    pub fn piop_params(&self) -> &PiopParams<F, Curve, CS> {
         &self.piop_params
     }
 }

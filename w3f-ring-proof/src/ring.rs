@@ -9,7 +9,7 @@ use ark_std::iter;
 use ark_std::ops::Range;
 use ark_std::vec::Vec;
 use w3f_pcs::pcs::kzg::urs::URS;
-use w3f_pcs::pcs::PcsParams;
+use w3f_pcs::pcs::{PCS, PcsParams};
 
 use w3f_plonk_common::domain::ZK_ROWS;
 
@@ -84,8 +84,8 @@ impl<
     /// - `piop_params`: SNARK parameters
     /// - `srs`: Should return `srs[range]` for `range = (piop_params.keyset_part_size..domain_size)`
     /// - `g`: Generator used in the SRS
-    pub fn empty(
-        piop_params: &PiopParams<F, VrfCurveConfig>,
+    pub fn empty<CS: PCS<F>>(
+        piop_params: &PiopParams<F, VrfCurveConfig, CS>,
         srs: impl Fn(Range<usize>) -> Result<Vec<KzgCurve::G1Affine>, ()>,
         g: KzgCurve::G1,
     ) -> Self {
@@ -161,8 +161,8 @@ impl<
     ///
     /// - `piop_params`: SNARK parameters.
     /// - `srs`: full-size Lagrangian SRS.
-    pub fn with_keys(
-        piop_params: &PiopParams<F, VrfCurveConfig>,
+    pub fn with_keys<CS: PCS<F>>(
+        piop_params: &PiopParams<F, VrfCurveConfig, CS>,
         keys: &[Affine<VrfCurveConfig>],
         srs: &RingBuilderKey<F, KzgCurve>,
     ) -> Self {

@@ -5,7 +5,7 @@ use ark_poly::Evaluations;
 use ark_std::marker::PhantomData;
 
 use ark_std::{vec, vec::Vec};
-use w3f_pcs::pcs::Commitment;
+use w3f_pcs::pcs::{PCS, Commitment};
 
 use crate::piop::params::PiopParams;
 use crate::piop::FixedColumns;
@@ -39,8 +39,8 @@ pub struct PiopProver<F: PrimeField, Curve: TECurveConfig<BaseField = F>> {
 }
 
 impl<F: PrimeField, Curve: TECurveConfig<BaseField = F>> PiopProver<F, Curve> {
-    pub fn build(
-        params: &PiopParams<F, Curve>,
+    pub fn build<CS: PCS<F>>(
+        params: &PiopParams<F, Curve, CS>,
         fixed_columns: FixedColumns<F, Affine<Curve>>,
         prover_index_in_keys: usize,
         secret: Curve::ScalarField,
@@ -72,8 +72,8 @@ impl<F: PrimeField, Curve: TECurveConfig<BaseField = F>> PiopProver<F, Curve> {
     }
 
     // TODO: move to params?
-    fn bits_column(
-        params: &PiopParams<F, Curve>,
+    fn bits_column<CS: PCS<F>>(
+        params: &PiopParams<F, Curve, CS>,
         index_in_keys: usize,
         secret: Curve::ScalarField,
     ) -> BitColumn<F> {

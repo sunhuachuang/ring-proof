@@ -18,7 +18,7 @@ where
     Jubjub: TECurveConfig<BaseField = F>,
     T: PlonkTranscript<F, CS>,
 {
-    piop_params: PiopParams<F, Jubjub>,
+    piop_params: PiopParams<F, Jubjub, CS>,
     fixed_columns_committed: FixedColumnsCommitted<F, CS::C>,
     plonk_verifier: PlonkVerifier<F, CS, T>,
 }
@@ -32,7 +32,7 @@ where
 {
     pub fn init(
         verifier_key: VerifierKey<F, CS>,
-        piop_params: PiopParams<F, Jubjub>,
+        piop_params: PiopParams<F, Jubjub, CS>,
         empty_transcript: T,
     ) -> Self {
         let pcs_vk = verifier_key.pcs_raw_vk.prepare();
@@ -68,7 +68,7 @@ where
             .verify(piop, proof, challenges, &mut rng)
     }
 
-    pub fn piop_params(&self) -> &PiopParams<F, Jubjub> {
+    pub fn piop_params(&self) -> &PiopParams<F, Jubjub, CS> {
         &self.piop_params
     }
 }
